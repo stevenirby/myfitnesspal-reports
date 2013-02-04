@@ -9,7 +9,7 @@ Myfitnesspal Reports - Display pretty interactive charts for all your nutirition
 
 ## Getting Started
 
-* Drag this bookmarklet up to your browser bookmark toolbar: [http://jsfiddle.net/6zHWg/](http://jsfiddle.net/6zHWg/)
+* Go to this URL and drag the bookmarklet up to your browser bookmark toolbar: [http://jsfiddle.net/6zHWg/](http://jsfiddle.net/6zHWg/)
 * Login to myfitnesspal.com
 * Go to any page and press the bookmarklet button on your toolbar
 
