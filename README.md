@@ -14,11 +14,10 @@ Getting Started
 * Go to any page and press the bookmarklet button on your toolbar
 
 Myfitnesspal Report Bookmarklet turns this:
-<img src="http://raw.github.com/stevenirby/myfitnesspal-reports/master/img/before.png"/>
-![solarized palette](https://github.com/stevenirby/myfitnesspal-reports/raw/master/img/before.png)
+![before](https://github.com/stevenirby/myfitnesspal-reports/raw/master/img/before.png)
 
 Into this:
-<img src="http://raw.github.com/stevenirby/myfitnesspal-reports/master/img/after.png"/>
+![after](https://github.com/stevenirby/myfitnesspal-reports/raw/master/img/after.png)
 
 
 See LICENSE.
