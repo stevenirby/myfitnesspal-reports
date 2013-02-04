@@ -15,7 +15,7 @@ Getting Started
 
 Myfitnesspal Report Bookmarklet turns this:
 <img src="http://raw.github.com/stevenirby/myfitnesspal-reports/master/img/before.png"/>
-![solarized palette](https://github.com/stevenirby/myfitnesspal-reports/raw/master/img/solarized-palette.png)
+![solarized palette](https://github.com/stevenirby/myfitnesspal-reports/raw/master/img/before.png)
 
 Into this:
 <img src="http://raw.github.com/stevenirby/myfitnesspal-reports/master/img/after.png"/>
