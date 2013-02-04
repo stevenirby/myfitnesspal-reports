@@ -14,9 +14,11 @@ Getting Started
 * Go to any page and press the bookmarklet button on your toolbar
 
 Myfitnesspal Report Bookmarklet turns this:
+
 ![before](https://github.com/stevenirby/myfitnesspal-reports/raw/master/img/before.png)
 
 Into this:
+
 ![after](https://github.com/stevenirby/myfitnesspal-reports/raw/master/img/after.png)
 
 
