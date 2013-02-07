@@ -116,9 +116,12 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 date = new Date();
             
             date.setDate(date.getDate() - this.days);
-            
+           
             startDate = date;
             stopDate = new Date();
+            // set the dates to midnight, for better accuracy
+            startDate.setHours(0,0,0,0);
+            stopDate.setHours(0,0,0,0);
             
             currentDate = startDate;
             while (currentDate <= stopDate) {
@@ -136,7 +139,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 x = 0, field, key,
                 me = this, n; 
 
+            // iterate over segments nutrition, fitness, "1" (really why are they using "1"!?)
             for (key in this.segments) {
+                // iterate over the fields
                 if (this.segments.hasOwnProperty(key)) {
                     fields = this.segments[key];
                     // run through the fields (calories, sugar, fiber, etc.)
@@ -161,9 +166,12 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
              * asynchronously request xml from myfitnesspal
              */
 
-            //var url = 'http://localhost:1337/365.xml';
-            var url = 'http://www.myfitnesspal.com/reports/results/';
-            url = url + segment + '/' + field + '/365'; // set this to 365 - weight loss data only comes in 7, 30, 90, and 365
+            if (window.location.href.indexOf('localhost') > -1) {
+                var url = 'http://localhost:1337/365.xml';
+            } else {
+                var url = 'http://www.myfitnesspal.com/reports/results/';
+                url = url + segment + '/' + field + '/365'; // set this to 365 - weight loss data only comes in 7, 30, 90, and 365
+            }
             console.log(url);
             
             return $.ajax({
@@ -207,7 +215,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     var Graph = function (parent, field) {
         var markup = [
             '<div class="graphContainer"> ',
-            '    <h2></h2> ',
+            '    <h2></h2> <h3>Average of data: <span></span></h3>',
             '    <div class="selectionContainer" style="display: none;"><p>You selected: <span class="selection"></span></p></div>',
             '    <p><button class="zoom" type="button" style="-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;',
             ' -webkit-box-shadow:inset 0px 1px 0px 0px #ffffff; box-shadow:inset 0px 1px 0px 0px #ffffff; background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf) ); background:-moz-linear-gradient( center top, #ededed 5%, #dfdfdf 100% ); background-color:#ededed; -moz-border-radius:6px; -webkit-border-radius:6px; border-radius:6px; border:1px solid #dcdcdc; color:#777777; font-family:arial; font-size:15px; font-weight:bold; padding:6px 24px; text-decoration:none; text-shadow:1px 1px 0px #ffffff;">Zoom in</button></p> ',
@@ -239,6 +247,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         this.zooming = false;
         this.$container = $(markup.join(''));
         this.$container.find('h2').text(field);
+        this.setAverage();
         this.previousHoverPoint = null;
         this.chartOptions = {
             grid: {
@@ -273,6 +282,30 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     };
     
     Graph.prototype = {
+        setAverage: function (data) {
+            /*
+             * get the average for the current range of data shown on graph
+             */
+
+            var data = data || this._parent.allData[this.field],
+                dataLength = data.length,
+                i, sum = 0,
+                average,
+                value; 
+
+            for (i = 0; i < dataLength; i++) {
+                value = parseFloat(data[i][1], 10);
+                sum += value;
+            }
+
+            average = Math.round(sum / dataLength);
+
+            if (!isNaN(average)) {
+                this.$container.find('h3 span').text(average);
+            }
+
+            return average 
+        },
         graphData: function () {
             /*
              * add graphs to the page
@@ -299,7 +332,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         },
         _fixUpLegend: function () {
             /*
-             * errrr stupid legend and bad css on the page
+             * fix legend that breaks because of funky css on the page
              */
             
             this.$container.find('table').css('width', 'auto');
@@ -365,6 +398,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 this.$container.find('.zoom').show();
                 this.zooming = false;
                 this.plot = $.plot(this.$graph, this.graphData, this.chartOptions);
+                this.setAverage();
                 this._fixUpLegend();
                 $clicked.hide();
                 this.$container.find('.pauseZoom').hide();
@@ -418,9 +452,12 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
              */
             if (this.zooming && $.type(ranges) !== 'null') {
                 var from = this.convertDateToString(ranges.xaxis.from.toFixed(1)),
-                    to = this.convertDateToString(ranges.xaxis.to.toFixed(1));
+                    to = this.convertDateToString(ranges.xaxis.to.toFixed(1)),
+                    newData;
 
                 this.$container.find('.selection').text(from + " to " + to);
+                newData = this._getRangeOfData(ranges.xaxis.from, ranges.xaxis.to);
+                this.setAverage(newData);
             } else {
                 // not zooming, so clear the selection
                 this.plot.clearSelection();
@@ -431,6 +468,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
              * once an area on the graph has been selected, redraw the graph
              */
 
+            var newData;
+
             if (this.zooming) {
                 this.plot = $.plot(this.$graph, this.graphData, $.extend(true, {}, this.chartOptions, {
                     xaxis: {
@@ -438,11 +477,39 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                     	max: ranges.xaxis.to
                     }
 	    	    }));
+
+                // sign... isn't that cute, its returning a random *time* in a day, where
+                // the user selected! Not an exact date whole date. So get the full
+                // nearest date to where they were selecting.
+                newData = this._getRangeOfData(ranges.xaxis.from, ranges.xaxis.to);
+                this.setAverage(newData);
                 this._fixUpLegend();
             } else {
                 // not zooming, so clear the selection
                 this.plot.clearSelection();
             }
+        },
+        _getRangeOfData: function (axisFrom, axisTo) {
+            /*
+             * take in range of and convert to dates, for range of data
+             */
+
+            var from = this._parent.dates.indexOf(this._getFullDate(axisFrom)),
+                to = this._parent.dates.indexOf(this._getFullDate(axisTo)),
+                data = this._parent.allData[this.field].slice(from, to);
+
+            return data;
+        },
+        _getFullDate: function (dateTime) {
+            /*
+             * get the current date from some random time and date; at
+             * midnight
+             */
+
+            var d = new Date(dateTime);
+            d.setHours(0,0,0,0);
+
+            return d.getTime();
         },
         _showTooltip: function (x, y, contents) {
             /*
