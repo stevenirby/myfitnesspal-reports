@@ -864,8 +864,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     };
         
 
-    addLink('http://localhost:1337/myfitnesspal-reports/css/style.css');
+    addLink('http://raw.github.com/stevenirby/myfitnesspal-reports/master/css/style.css');
     addLink('http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css');
+        
 
     // add jQuery
     addScript('http://code.jquery.com/jquery-1.9.0.min.js', function () {
