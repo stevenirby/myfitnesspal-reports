@@ -863,10 +863,10 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         }
     };
         
-
-    addLink('http://raw.github.com/stevenirby/myfitnesspal-reports/master/css/style.css');
+    addLink('http://www.sendsteven.com/wp-content/uploads/2013/02/style.css');
+    // figureout a better way to do the css, since github is setting a bad mine type
+    // addLink('http://raw.github.com/stevenirby/myfitnesspal-reports/master/css/style.css');
     addLink('http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css');
-        
 
     // add jQuery
     addScript('http://code.jquery.com/jquery-1.9.0.min.js', function () {
