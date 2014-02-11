@@ -132,7 +132,8 @@ button.zoom{
     width: 200px;
 }
 
-.arrow {
+/*==========  Subsection comment block  ==========*/
+{
     width: 0px;      
     height: 0px;      
     border-left: 7px solid transparent;

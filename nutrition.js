@@ -1,6 +1,6 @@
 /*
 
-  Myfitnesspall Reports Bookmarklet Copyright 2013 Steven Irby
+Myfitnesspal Reports Bookmarklet Copyright 2013 Steven Irby
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -22,6 +22,13 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
+
+// TODO - re-write time!
+// - if something fails to download, try again for 2 more times, then give up,
+// and show message saying, sorry didn't download
+// - re-write so everything is asyncronous, so one data is downloaded, graph
+// it. No waiting around for all the data to download. Lame.
+// - add new default to drop-down "this week" starting from Monday.
 
 (function () { 
   
@@ -98,7 +105,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         // add modal markup to page
         var modal = [
-            '<div class="modal"><h1>Generating Report Page</h1><h2>Please wait...</h2>',
+            '<div class="modal"><h1>Generating Report Page</h1><h2>Please wait...</h2><h3>Downloading data for: <span></span></h3>',
             '</div>'
         ],
         markup = [
@@ -107,7 +114,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             '   <div class="weight"><h4>Weight:</h4> <a href="#" title=""><h4 class="weightNumber"> </h4></a> <span class="arrow">&nbsp;</span>',
             '       <sub><a href="#" title="This compares your current weight to your last weight in.">What\'s this?</a></sub>',
             '   </div>',
-            '   <div class="calories"><h4>Net Calorie Average:</h4> <a href="#" title=""><h4 class="caloriesNumber"> </h4></a> <span class="arrow">&nbsp;</span>',
+            '   <div class="calories"><h4>Net Calorie Average so far this week:</h4> <a href="#" title=""><h4 class="caloriesNumber"> </h4></a> <span class="arrow">&nbsp;</span>',
             '       <sub><a href="#" title="This compares this weeks average with the an average from the last four weeks; before this week. This assumes you are trying to lose weight, not gain. :)">What\'s this?</a></sub>',
             '   </div>',
             '</div>',
@@ -129,7 +136,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
        
         // wait for all the data before continuing on
         // TODO - what if there is an error?
-        $.when.apply(null, this.dfds).then(function () {
+        $.when.apply($, this.dfds).always(function () {
             me.setWeightTrend();
             me.setCarloriesTrend();
             me.addMasterGraph();
@@ -178,7 +185,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
             this.allData = {};
             var i, fields,
-                x = 0, field, key,
+                x = 0, f = 0, field, key,
                 me = this, n; 
 
             // TODO - save data to local storage, if there is no new data to fetch....
@@ -192,20 +199,21 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 if (this.segments.hasOwnProperty(key)) {
                     fields = this.segments[key];
                     // run through the fields (calories, sugar, fiber, etc.)
-                    $.each(fields, function (i, field) {
-                        me.allData[field] = [];
-                        me.dfds.push(me.fetchData(key, field).pipe(function (xml) {
-                            var $xml = $(xml), value;
-
-                            console.log('creating data for: ' + field);
-                            console.log($('.modal').find('h3 span').text());
+                    for (f = 0; f < fields.length; f++) {
+                        me.allData[fields[f]] = [];
+                        // push the chained function into a list of deferreds, so we can wait for them
+                        // all to finsh. Of course, pass in the correct reffernces
+                        me.dfds.push(me.fetchData(key, fields[f]).done($.proxy(function (fields, f, json) {
+                            var data = json.data, value,
+                                text = json.label;
+                            $('.modal h3 span').text(text);
                             // get dates from first row string, and only do this once!
                             for (n = 0; n < me.dates.length; n++) {
-                                value = $xml.find('row:eq(1) number:eq(' + n + ')').text();
-                                me.allData[field].push([me.dates[n], value]);
+                                value = data[n].total;
+                                me.allData[fields[f]].push([me.dates[n], value]);
                             }
-                        }));
-                    });
+                        }, this, fields, f)));
+                    }
                 }
             }
         },
@@ -214,21 +222,18 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
              * asynchronously request xml from myfitnesspal
              */
 
-            if (window.location.href.indexOf('localhost') > -1) {
-                var url = 'http://localhost:1337/365.xml';
-            } else {
-                var url = 'http://www.myfitnesspal.com/reports/results/';
-                url = url + segment + '/' + field + '/365'; // set this to 365 - weight loss data only comes in 7, 30, 90, and 365
-            }
-            console.log(url);
+            var url = 'http://www.myfitnesspal.com/reports/results/';
+            url = url + segment + '/' + field + '/365.json'; // set this to 365 - weight loss data only comes in 7, 30, 90, and 365
             
             return $.ajax({
                 type: 'GET',
                 url: url,
-                dataType: "xml",
-                success: function (xml){
-                    return xml;  
+                dataType: "json",
+                success: function (json){
+                    return json;
                 }
+            }).fail(function () {
+                // TODO - retry?
             });
         },
         cleanDom: function () {
@@ -240,8 +245,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         },
         setWeightTrend: function () {
             /*
-                set the trending weight
-            */
+             *   set the trending weight
+             */
 
             // first populate the progress part
             var weight = this.allData["1"].slice(-1)[0][1],
@@ -439,6 +444,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 {min: 0, show: false},
                 {show: false}
             ],
+            series: {curvedLines: {active: true}},
             selection: {
                 mode: "x"
             },
@@ -601,6 +607,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 {min: 0},
                 {position: 'right', labelWidth: 30}
             ],
+            series: {curvedLines: {active: true}},
 	        selection: {
 	        	mode: "x"
 	        },
@@ -648,15 +655,23 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             this.graphData = [{
                     label: this.field,
                     data : this._parent.allData[this.field],
+                    lines: { show: true, lineWidth: 3},
+                    curvedLines: {apply:true},
                     yaxis: 1
                 },
                 {
                     label: 'Weight Loss',
                     data : this._parent.allData['1'],
+                    lines: { show: true, lineWidth: 3},
+                    curvedLines: {apply:true},
                     yaxis: 2
                 }
             ];
 
+            if (!this._parent.allData[this.field].length) {
+                var $msg = ' <span>Opps! Failed to download this data. This happens because myfitnesspal took to long to send this data.</span>';
+                this.$container.find('h2').after($msg);
+            }
             $('#content').append(this.$container);
             this.$graph = this.$container.find('.graph');
             this.plot = $.plot(this.$graph, this.graphData, this.chartOptions);
