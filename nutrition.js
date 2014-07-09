@@ -888,9 +888,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         addScript('http://code.jquery.com/ui/1.10.1/jquery-ui.js', function () {
             // add graphing library
             $(document).ready(function () {
-                addScript('http://raw.github.com/flot/flot/master/jquery.flot.js', function () {
-                    addScript('http://raw.github.com/flot/flot/master/jquery.flot.time.js', function () {
-                        addScript('http://raw.github.com/flot/flot/master/jquery.flot.selection.js', function () {
+                addScript('http://cdn.rawgit.com/flot/flot/master/jquery.flot.js', function () {
+                    addScript('http://cdn.rawgit.com/flot/flot/master/jquery.flot.time.js', function () {
+                        addScript('http://cdn.rawgit.com/flot/flot/master/jquery.flot.selection.js', function () {
                             window.Report = new Report();
                         });
                     });
