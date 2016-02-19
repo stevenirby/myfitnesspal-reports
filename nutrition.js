@@ -30,9 +30,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // it. No waiting around for all the data to download. Lame.
 // - add new default to drop-down "this week" starting from Monday.
 
-(function () { 
-  
-    // add method to Date for adding days 
+(function () {
+
+    // add method to Date for adding days
     Date.prototype.addDays = function(days) {
         var date = new Date(this.valueOf())
         date.setDate(date.getDate() + days);
@@ -56,7 +56,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             }
         };
     }
-    
+
     function addLink(src, cb) {
         // add script to the page
         var link = document.createElement('link');
@@ -73,34 +73,34 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
         this.segments = {
             nutrition: [
-                'Net Calories',
-                'Calories',
-                'Carbs',
-                'Fat',
-                'Protein',
-                'Saturated Fat',
-                'Polyunsaturated Fat',
-                'Monounsaturated Fat',
-                'Trans Fat',
-                'Cholesterol',
-                'Sodium',
-                'Potassium',
-                'Fiber',
-                'Sugar',
-                'Vitamin A',
-                'Vitamin C',
-                'Iron',
-                'Calcium'
+                'Net Calories'//,
+            //    'Calories',
+            //    'Carbs',
+            //    'Fat',
+            //    'Protein',
+            //    'Saturated Fat',
+            //    'Polyunsaturated Fat',
+            //    'Monounsaturated Fat',
+            //    'Trans Fat',
+            //    'Cholesterol',
+            //    'Sodium',
+            //    'Potassium',
+            //    'Fiber',
+            //    'Sugar',
+            //    'Vitamin A',
+            //    'Vitamin C',
+            //    'Iron',
+            //    'Calcium'
             ],
-            fitness: [
-                'Calories Burned',
-                'Exercise Minutes'
-            ],
+            //fitness: [
+            //    'Calories Burned',
+            //    'Exercise Minutes'
+            //],
             progress: [
                 '1'
             ]
         };
-        
+
         this.dfds = [];
 
         // add modal markup to page
@@ -126,14 +126,14 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
         this.cleanDom();
-        
+
         $('#content').append($(markup.join('')));
         $( document ).tooltip();
 
         this.showModal();
         this.createDates();
         this.generateData();
-       
+
         // wait for all the data before continuing on
         // TODO - what if there is an error?
         $.when.apply($, this.dfds).always(function () {
@@ -163,15 +163,15 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 stopDate,
                 currentDate,
                 date = new Date();
-            
+
             date.setDate(date.getDate() - this.days);
-           
+
             startDate = date;
             stopDate = new Date();
             // set the dates to midnight, for better accuracy
             startDate.setHours(0,0,0,0);
             stopDate.setHours(0,0,0,0);
-            
+
             currentDate = startDate;
             while (currentDate <= stopDate) {
                this.dates.push(currentDate.getTime());
@@ -186,7 +186,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             this.allData = {};
             var i, fields,
                 x = 0, f = 0, field, key,
-                me = this, n; 
+                me = this, n;
 
             // TODO - save data to local storage, if there is no new data to fetch....
             //      - not sure how to know if there is or isn't data to fetch, maybe if script is ran, within an hour of last being ran
@@ -224,7 +224,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
             var url = 'http://www.myfitnesspal.com/reports/results/';
             url = url + segment + '/' + field + '/365.json'; // set this to 365 - weight loss data only comes in 7, 30, 90, and 365
-            
+
             return $.ajax({
                 type: 'GET',
                 url: url,
@@ -274,12 +274,12 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
             $content.find('.main .weight .weightNumber').text(weight);
             $content.find('.main .weight .weightNumber').parent().attr('title', tooltip);
-            $content.find('.main .weight .arrow').addClass(direction).addClass(color); 
+            $content.find('.main .weight .arrow').addClass(direction).addClass(color);
         },
         setCarloriesTrend: function () {
             /*
                 set the calories trend:
-                - this looks at the current weeks average calorie count, 
+                - this looks at the current weeks average calorie count,
                 - against the all the previous weeks averages for the last month
             */
 
@@ -331,11 +331,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 value = parseFloat(data[i][1], 10);
                 sum += value;
             }
-            
+
             average = Math.round(sum / dataLength);
-            
+
             if (!isNaN(average)) {
-                return average;                
+                return average;
             }
         },
         addMasterGraph: function () {
@@ -350,7 +350,9 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
              * create a new graph object for all fields
              */
 
-            var i, key, fields, fieldsLength, graph;
+            this.allGraphs.push( new LookbackGraph().init(this, this.segments.progress[0]) );
+
+            var i, key, fields, fieldsLength;
 
             for (key in this.segments) {
                 if (this.segments.hasOwnProperty(key)) {
@@ -359,8 +361,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
                     for (i = 0; i < fieldsLength; i++) {
                         if (fields[i] !== '1') {
-                            graph = new Graph(this, fields[i]);
-                            this.allGraphs.push(graph);
+                            this.allGraphs.push(new Graph().init(this, fields[i]));
                         }
                     }
                 }
@@ -369,7 +370,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
         zoomAllGraphs: function () {
             // zoom all graphs to specified range
 
-            var i, 
+            var i,
                 range = this.range,
                 graphsLength = this.allGraphs.length,
                 graph;
@@ -438,7 +439,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             },
             xaxes: [
                 {mode: "time", labelWidth: 30}
-            
+
             ],
             yaxes: [
                 {min: 0, show: false},
@@ -463,7 +464,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             // graph the data
 
             var field = 'Net Calories';
-    
+
             this.graphData = [{
                     data : this._parent.allData[field],
                     yaxis: 1
@@ -566,73 +567,88 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             });
         }
     };
-        
-    var Graph = function (parent, field) {
-        var markup = [
-            '<div class="graphContainer"> ',
-            '    <h2></h2> <h3>Average: <span></span></h3>',
-            '    <div class="selectionContainer"><p>You selected: <span class="selection"></span></p></div>',
-            '    <div class="zoomContainer"><button class="zoom" type="button">Zoom in</button><a href="#" title="Click this to start zooming only for this graph. Just click and drag a region on the graph to select a custom range of dates.">What\'s this?</a></div>',
-            '    <div class="zoomContainer"><button class="reportButton pauseZoom" type="button">Pause Zoom</button><a href="#" title="Click this to pause the zooming, so you can click on a date to see your diary for that day.">What\'s this?</a></div> ',
-            '    <div class="zoomContainer"><button class="reportButton resumeZoom" type="button">Resume Zoom</button><a href="#" title="Click this to zoom again.">What\'s this?</a></div> ',
-            '    <div class="zoomContainer"><button class="reportButton cancelZoom" type="button">Reset zoom</button><a href="#" title="Click this to go back to the default zoom. (What the main graph at the top is set to show.)">What\'s this?</a></div> ',
-            '    <div class="graph"></div>',
-            '    <span class="clickdata"></span>',
-            '    <div class="legend"></div>',
-            '</div> ',
-        ];
-        
-        this._parent = parent; // lazily pass in parent
-        this.field = field;
-        this.zooming = false;
-        this.$container = $(markup.join(''));
-        this.$container.find('h2').text(field);
-        this.setAverage();
-        this.previousHoverPoint = null;
-        this.chartOptions = {
-            grid: {
-                aboveData: false,
-                axisMargin: 0,
-                borderWidth: 0,
-                clickable: true,
-                hoverable: true,
-                autoHighlight: true,
-                mouseActiveRadius: 50
-            },
-            xaxes: [
-                {mode: "time", labelWidth: 30},
-            
-            ],
-            yaxes: [
-                {min: 0},
-                {position: 'right', labelWidth: 30}
-            ],
-            series: {curvedLines: {active: true}},
-	        selection: {
-	        	mode: "x"
-	        },
-            legend: {
-                show: true,
-                position: 'nw',
-                container: this.$container.find('.legend'),
-                backgroundColor: null
-            }
+
+    /**
+     * Base Graph
+     * @constructor
+     */
+    function Graph() {
+
+        /**
+         * Initializes the graph giving the ability to override the method
+         * @param parent
+         * @param field
+         * @param   {String}    [opt_label]     The optional label (hard-coded)
+         * @returns {Graph}
+         */
+        this.init = function(parent, field, opt_label){
+            var markup = [
+                '<div class="graphContainer"> ',
+                '    <h2></h2> <h3>Average: <span></span></h3>',
+                '    <div class="selectionContainer"><p>You selected: <span class="selection"></span></p></div>',
+                '    <div class="zoomContainer"><button class="zoom" type="button">Zoom in</button><a href="#" title="Click this to start zooming only for this graph. Just click and drag a region on the graph to select a custom range of dates.">What\'s this?</a></div>',
+                '    <div class="zoomContainer"><button class="reportButton pauseZoom" type="button">Pause Zoom</button><a href="#" title="Click this to pause the zooming, so you can click on a date to see your diary for that day.">What\'s this?</a></div> ',
+                '    <div class="zoomContainer"><button class="reportButton resumeZoom" type="button">Resume Zoom</button><a href="#" title="Click this to zoom again.">What\'s this?</a></div> ',
+                '    <div class="zoomContainer"><button class="reportButton cancelZoom" type="button">Reset zoom</button><a href="#" title="Click this to go back to the default zoom. (What the main graph at the top is set to show.)">What\'s this?</a></div> ',
+                '    <div class="graph"></div>',
+                '    <span class="clickdata"></span>',
+                '    <div class="legend"></div>',
+                '</div> ',
+            ];
+
+            this._parent = parent; // lazily pass in parent
+            this.field = field;
+            this.zooming = false;
+            this.$container = $(markup.join(''));
+            this.$container.find('h2').text(opt_label || field);
+            this.setAverage();
+            this.previousHoverPoint = null;
+            this.chartOptions = $.extend(true, {
+                grid: {
+                    aboveData: false,
+                    axisMargin: 0,
+                    borderWidth: 0,
+                    clickable: true,
+                    hoverable: true,
+                    autoHighlight: true,
+                    mouseActiveRadius: 50
+                },
+                xaxes: [
+                    {mode: "time", labelWidth: 30},
+
+                ],
+                yaxes: [
+                    {min: 0},
+                    {position: 'right', labelWidth: 30}
+                ],
+                series: {curvedLines: {active: true}},
+                selection: {
+                    mode: "x"
+                },
+                legend: {
+                    show: true,
+                    position: 'nw',
+                    container: this.$container.find('.legend'),
+                    backgroundColor: null
+                }
+            });
+
+            this.graphData();
+
+            return this;
         };
 
-        this.graphData();
-    };
-
-    Graph.prototype = {
-        setAverage: function (data) {
-            /*
-             * get the average for the current range of data shown on graph
-             */
-
+        /**
+         * get the average for the current range of data shown on graph
+         * @param data
+         * @returns {number|*}
+         */
+        this.setAverage = function (data) {
             var data = data || this._parent.allData[this.field],
                 dataLength = data.length,
                 i, sum = 0,
                 average,
-                value; 
+                value;
 
             for (i = 0; i < dataLength; i++) {
                 value = parseFloat(data[i][1], 10);
@@ -645,20 +661,20 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 this.$container.find('h3 span').text(average);
             }
 
-            return average 
-        },
-        graphData: function () {
-            /*
-             * add graphs to the page
-             */
+            return average
+        };
 
+        /**
+         * add graphs to the page
+         */
+        this.graphData = function () {
             this.graphData = [{
-                    label: this.field,
-                    data : this._parent.allData[this.field],
-                    lines: { show: true, lineWidth: 3},
-                    curvedLines: {apply:true},
-                    yaxis: 1
-                },
+                label: this.field,
+                data : this._parent.allData[this.field],
+                lines: { show: true, lineWidth: 3},
+                curvedLines: {apply:true},
+                yaxis: 1
+            },
                 {
                     label: 'Weight Loss',
                     data : this._parent.allData['1'],
@@ -678,17 +694,24 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
             this._fixUpLegend();
             this.bindEvents();
-        },
-        _fixUpLegend: function () {
-            /*
-             * fix legend that breaks because of funky css on the page
-             */
-            
+        };
+
+        /**
+         * fix legend that breaks because of funky css on the page
+         * @private
+         */
+        this._fixUpLegend = function () {
             this.$container.find('table').css('width', 'auto');
             this.$container.find('td').css({'border-bottom' : '0', 'vertical-align' : 'middle'});
             this.$container.find('.legendLabel').css('padding-left', '10px');
-        },
-        convertDateToString: function (dateObj, backwards) {
+        };
+
+        /**
+         * @param dateObj
+         * @param backwards
+         * @returns {string}
+         */
+        this.convertDateToString = function (dateObj, backwards) {
             var d = new Date(parseInt(dateObj, 10)),
                 month = d.getMonth() + 1,
                 day = d.getDate(),
@@ -698,29 +721,31 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             if (backwards) {
                 date = year + "-" + month + "-" + day;
             }
-            
-            return date; 
-        },
-        bindEvents: function () {
-            /*
-             * bind all graph events
-             */
 
+            return date;
+        };
+
+        /**
+         * bind all graph events
+         */
+        this.bindEvents = function () {
             var me = this;
-
             this.$container.find('.zoomContainer:eq(0)').show();
             this.$container.find('button').bind('click', $.proxy(me._zoomButton, me));
-	    	this.$graph.bind('plothover', $.proxy(me._plotHover, me));
-	    	this.$graph.bind('plotclick', $.proxy(me._plotclick, me));
+            this.$graph.bind('plothover', $.proxy(me._plotHover, me));
+            this.$graph.bind('plotclick', $.proxy(me._plotclick, me));
             this.$graph.bind('plotselecting', $.proxy(me._plotselecting, me));
             this.$graph.bind('plotselected', $.proxy(me._plotselected, me));
-        },
-        _zoomButton: function (event) {
-            /*
-             * hide and show zoom buttons
-             */
+        };
+
+        /**
+         * hide and show zoom buttons
+         * @param event
+         * @private
+         */
+        this._zoomButton = function (event) {
             var $clicked = $(event.currentTarget);
-            
+
             if ($clicked.hasClass('zoom')) {
                 // - turn on zooming
                 // - hide the zoom button and show the cancel zoom button
@@ -743,7 +768,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
             } else {
                 // - turn off zooming
                 // - show the zoom button
-                // - reset the graph 
+                // - reset the graph
                 this.$container.find('.selectionContainer').hide();
                 this.$container.find('.zoom').show().parent().show();
                 this.zooming = false;
@@ -754,52 +779,64 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 this.$container.find('.pauseZoom').hide().parent().hide();
                 this.$container.find('.resumeZoom').hide().parent().hide();
             }
-        },
-        _plotHover: function (event, pos, item) {
-            /*
-             * show the tooltip when you hover over points on the graph
-             */
+        };
+
+        /**
+         * show the tooltip when you hover over points on the graph
+         * @param event
+         * @param pos
+         * @param item
+         * @private
+         */
+        this._plotHover = function (event, pos, item) {
             if (item) {
-            	if (this.previousHoverPoint != item.dataIndex) {
+                if (this.previousHoverPoint != item.dataIndex) {
 
-            		this.previousHoverPoint = item.dataIndex;
+                    this.previousHoverPoint = item.dataIndex;
 
-            		$("#tooltip").remove();
-            		var x = item.datapoint[0].toFixed(2),
+                    $("#tooltip").remove();
+                    var x = item.datapoint[0].toFixed(2),
                         date = this.convertDateToString(x),
                         text = 'Click to see what you ate on this date: ' + date;
 
                     if (this.zooming) {
                         text = '* Pause / Reset zooming to click on a date! *';
                     }
-            		
-                    this._showTooltip(item.pageX, item.pageY, text);
-            	}
-            } else {
-            	$("#tooltip").remove();
-            	this.previousHoverPoint = null;            
-            }
-        },
-        _plotclick: function (event, pos, item) {
-            /*
-             * open new page when point is clicked
-             */
 
+                    this._showTooltip(item.pageX, item.pageY, text);
+                }
+            } else {
+                $("#tooltip").remove();
+                this.previousHoverPoint = null;
+            }
+        };
+
+        /**
+         * open new page when point is clicked
+         * @param event
+         * @param pos
+         * @param item
+         * @private
+         */
+        this._plotclick = function (event, pos, item) {
             if (!this.zooming) {
-	            if (item) {
+                if (item) {
                     var x = item.datapoint[0].toFixed(2),
                         date = this.convertDateToString(x, true);
 
-                        console.log('http://www.myfitnesspal.com/food/diary?date=' +  date);
-                        window.open('http://www.myfitnesspal.com/food/diary?date=' +  date, '_blank');
-	    	    }
+                    console.log('http://www.myfitnesspal.com/food/diary?date=' +  date);
+                    window.open('http://www.myfitnesspal.com/food/diary?date=' +  date, '_blank');
+                }
             }
-        },
-        _plotselecting: function (event, ranges) {
-            /*
-             * when selecting a range to zoom in on, show the selected date
-             * range
-             */
+        };
+
+        /**
+         * when selecting a range to zoom in on, show the selected date range
+         * @param event
+         * @param ranges
+         * @private
+         */
+        this._plotselecting = function (event, ranges) {
             if (this.zooming && $.type(ranges) !== 'null') {
                 var from = this.convertDateToString(ranges.xaxis.from.toFixed(1)),
                     to = this.convertDateToString(ranges.xaxis.to.toFixed(1)),
@@ -812,21 +849,24 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 // not zooming, so clear the selection
                 this.plot.clearSelection();
             }
-        },
-        _plotselected: function (event, ranges) {
-            /*
-             * once an area on the graph has been selected, redraw the graph
-             */
+        };
 
+        /**
+         * once an area on the graph has been selected, redraw the graph
+         * @param event
+         * @param ranges
+         * @private
+         */
+        this._plotselected = function (event, ranges) {
             var newData;
 
             if (this.zooming) {
                 this.plot = $.plot(this.$graph, this.graphData, $.extend(true, {}, this.chartOptions, {
                     xaxis: {
-                    	min: ranges.xaxis.from,
-                    	max: ranges.xaxis.to
+                        min: ranges.xaxis.from,
+                        max: ranges.xaxis.to
                     }
-	    	    }));
+                }));
 
                 // sign... isn't that cute, its returning a random *time* in a day, where
                 // the user selected! Not an exact date whole date. So get the full
@@ -838,46 +878,124 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
                 // not zooming, so clear the selection
                 this.plot.clearSelection();
             }
-        },
-        _getRangeOfData: function (axisFrom, axisTo) {
-            /*
-             * take in range of and convert to dates, for range of data
-             */
+        };
 
+        /**
+         * take in range of and convert to dates, for range of data
+         * @param axisFrom
+         * @param axisTo
+         * @returns {Array.<T>|string|Blob|ArrayBuffer}
+         * @private
+         */
+        this._getRangeOfData = function (axisFrom, axisTo) {
             var from = this._parent.dates.indexOf(this._getFullDate(axisFrom)),
                 to = this._parent.dates.indexOf(this._getFullDate(axisTo)),
                 data = this._parent.allData[this.field].slice(from, to);
 
             return data;
-        },
-        _getFullDate: function (dateTime) {
-            /*
-             * get the current date from some random time and date; at
-             * midnight
-             */
+        };
 
+        /**
+         * get the current date from some random time and date; at midnight
+         * @param dateTime
+         * @returns {number}
+         * @private
+         */
+        this._getFullDate = function (dateTime) {
             var d = new Date(dateTime);
             d.setHours(0,0,0,0);
-
             return d.getTime();
-        },
-        _showTooltip: function (x, y, contents) {
-            /*
-             * show the tooltip
-             */
-	        $('<div id="tooltip">' + contents + '</div>').css({
-	    	    position: "absolute",
-	    	    display: "none",
-	    	    top: y + 5,
-	    	    left: x + 5,
-	    	    border: "1px solid #fdd",
-	    	    padding: "2px",
-	    	    "background-color": "#fee",
-	    	    opacity: 0.80
-	    	}).appendTo("body").fadeIn(200);
-        }
+        };
+
+        /**
+         * show the tooltip
+         * @param x
+         * @param y
+         * @param contents
+         * @private
+         */
+        this._showTooltip = function (x, y, contents) {
+            $('<div id="tooltip">' + contents + '</div>').css({
+                position: "absolute",
+                display: "none",
+                top: y + 5,
+                left: x + 5,
+                border: "1px solid #fdd",
+                padding: "2px",
+                "background-color": "#fee",
+                opacity: 0.80
+            }).appendTo("body").fadeIn(200);
+        };
+
     };
-        
+
+    /**
+     * Provides an extended base graph to look back on previous timelines
+     * @extends {Graph}
+     * @constructor
+     */
+    function LookbackGraph(){
+
+        /**
+         * Overrides the initialization configuration
+         */
+        this.init = function(parent, field){
+            // override chart configuration
+            this.chartOptions = {};
+            return Object.getPrototypeOf(this).init.call(this, parent, field, field === '1' ? 'Weight Loss' : field);
+        };
+
+        /**
+         * add graphs to the page
+         */
+        this.graphData = function () {
+
+            var self = this,
+                daysShown = this._parent.masterGraph.daysShown,
+                segmentLen = this._parent.allData[this.field].length,
+                dataLen;
+
+            // append data to each day for the previous 3 time intervals (e.g.: last week, 2 weeks ago, 3 weeks ago)
+            for(var i = 0; i < segmentLen; i++){
+                if(!dataLen)
+                    dataLen = this._parent.allData[this.field][i].length - 1;
+                this._parent.allData[this.field][i].push( (this._parent.allData[this.field][i - daysShown * 1] || [])[2] || 0 );
+                this._parent.allData[this.field][i].push( (this._parent.allData[this.field][i - daysShown * 2] || [])[2] || 0 );
+                this._parent.allData[this.field][i].push( (this._parent.allData[this.field][i - daysShown * 3] || [])[2] || 0 );
+            }
+
+            this.graphData = [3,2,1,0].map(function(i){
+                return $.extend({
+                    data: self._parent.allData[self.field],
+                    curvedLines: {apply:true}
+                }, i === 0 ? {
+                    label: 'Current Interval',
+                    lines: { show: true, lineWidth: 3},
+                    yaxis: 2
+                } : {
+                    label: i + ' interval ago',
+                    lines: { show: true, lineWidth: 1},
+                    yaxis: i + dataLen
+                });
+            });
+
+
+            if (!this._parent.allData[this.field].length) {
+                var $msg = ' <span>Opps! Failed to download this data. This happens because myfitnesspal took to long to send this data.</span>';
+                this.$container.find('h2').after($msg);
+            }
+            $('#content').append(this.$container);
+            this.$graph = this.$container.find('.graph');
+            this.plot = $.plot(this.$graph, this.graphData, this.chartOptions);
+
+            this._fixUpLegend();
+            this.bindEvents();
+        };
+    };
+    LookbackGraph.prototype = new Graph();
+    LookbackGraph.prototype.constructor = LookbackGraph;
+
+
     addLink('http://www.sendsteven.com/wp-content/uploads/2013/02/style.css');
     // figureout a better way to do the css, since github is setting a bad mine type
     // addLink('http://raw.github.com/stevenirby/myfitnesspal-reports/master/css/style.css');
