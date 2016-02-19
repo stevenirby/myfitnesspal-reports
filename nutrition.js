@@ -104,29 +104,29 @@
 
             this.segments = {
                 nutrition: [
-                    'Net Calories'//,
-                    //    'Calories',
-                    //    'Carbs',
-                    //    'Fat',
-                    //    'Protein',
-                    //    'Saturated Fat',
-                    //    'Polyunsaturated Fat',
-                    //    'Monounsaturated Fat',
-                    //    'Trans Fat',
-                    //    'Cholesterol',
-                    //    'Sodium',
-                    //    'Potassium',
-                    //    'Fiber',
-                    //    'Sugar',
-                    //    'Vitamin A',
-                    //    'Vitamin C',
-                    //    'Iron',
-                    //    'Calcium'
+                    'Net Calories',
+                    'Calories',
+                    'Carbs',
+                    'Fat',
+                    'Protein',
+                    'Saturated Fat',
+                    'Polyunsaturated Fat',
+                    'Monounsaturated Fat',
+                    'Trans Fat',
+                    'Cholesterol',
+                    'Sodium',
+                    'Potassium',
+                    'Fiber',
+                    'Sugar',
+                    'Vitamin A',
+                    'Vitamin C',
+                    'Iron',
+                    'Calcium'
                 ],
-                //fitness: [
-                //    'Calories Burned',
-                //    'Exercise Minutes'
-                //],
+                fitness: [
+                    'Calories Burned',
+                    'Exercise Minutes'
+                ],
                 progress: [
                     '1'
                 ]
@@ -1044,20 +1044,18 @@
          * Overrides the initialization configuration
          */
         this.init = function(parent){
-            return Object.getPrototypeOf(this).init.call(this, parent, '1', 'Weight Loss', {
+            return Object.getPrototypeOf(this).init.call(this, parent, '1', 'Look back on your progress', {
                 yaxes: [
                     {show:false}
                 ]
-            }, {
-                colors: ['#000099','#aaaaff','#aaaaff','#aaaaff']
             });
         };
 
         this.graphData = function(){
 
             var progressWeekBefore = [],
-                progress2WeeksBefore = [],
-                progress4WeeksBefore = [],
+                progress12WeeksBefore = [],
+                progress26WeeksBefore = [],
                 progressNow = [],
                 progress = this._parent.allData['1'],
                 min = 10000,
@@ -1071,38 +1069,44 @@
                 record = progress[i];
                 progressNow.push([ record[0], progress[i][1] || min ]);
                 progressWeekBefore.push([ record[0], (progress[ i - 7 ] || [])[1] || min ]);
-                progress2WeeksBefore.push([ record[0], (progress[ i - 14 ] || [])[1] || min ]);
-                progress4WeeksBefore.push([ record[0], (progress[ i - 28 ] || [])[1] || min ]);
+                progress12WeeksBefore.push([ record[0], (progress[ i - 84 ] || [])[1] || min ]);
+                progress26WeeksBefore.push([ record[0], (progress[ i - 182 ] || [])[1] || min ]);
             }
 
             return Object.getPrototypeOf(this).graphData.call(this, [
                 {
-                    data: progress4WeeksBefore,
+                    data: progress26WeeksBefore,
                     curvedLines: { apply:true },
-                    label: '4 weeks before',
-                    points: { show: true, lineWidth: 1},
-                    yaxis: 2
+                    lines: { show: true, lineWidth: 1},
+                    label: '6 months before',
+                    yaxis: 2,
+                    color: '#fafafa'
                 },
                 {
-                    data: progress2WeeksBefore,
+                    data: progress12WeeksBefore,
                     curvedLines: { apply:true },
-                    points: { show: true, lineWidth: 1},
-                    label: '2 weeks before',
-                    yaxis: 2
+                    label: '3 months before',
+                    lines: { show: true, lineWidth: 1},
+                    yaxis: 2,
+                    color: '#ccc'
                 },
                 {
                     data: progressWeekBefore,
                     curvedLines: { apply:true },
                     lines: { show: true, lineWidth: 1},
                     label: 'A week before',
-                    yaxis: 2
+                    yaxis: 2,
+                    color: '#666'
                 },
                 {
                     data: progressNow,
                     curvedLines: { apply:true },
-                    lines: { show: true, lineWidth: 5},
-                    label: 'Current',
-                    yaxis: 2
+                    lines: { show: true, lineWidth: 3},
+                    label: 'Current progress',
+                    yaxis: 2,
+                    // color the line green (for weight loss) or red (for weight gain)
+                    // * we assume the normal user wants to lose weight
+                    color: progressNow[progressNow.length - 1][1] > progressNow[0][1] ? '#900' : '#090'
                 }
             ]);
         };
