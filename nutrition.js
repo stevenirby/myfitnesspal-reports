@@ -1053,62 +1053,37 @@
 
         this.graphData = function(){
 
-            var progressWeekBefore = [],
-                progress12WeeksBefore = [],
-                progress26WeeksBefore = [],
-                progressNow = [],
+            var progressSeries = [
+                    { data:[], weeksBefore:12, label:'3 months before', color:'#fafafa' },
+                    { data:[], weeksBefore:8, label:'3 months before', color:'#eee' },
+                    { data:[], weeksBefore:4, label:'A month before', color:'#ccc' },
+                    { data:[], weeksBefore:3, label:'3 weeks before', color:'#999' },
+                    { data:[], weeksBefore:2, label:'2 weeks before', color:'#666' },
+                    { data:[], weeksBefore:1, label:'A week before', color:'#000' },
+                    { data:[], weeksBefore:0, label:'Current progress', color:'#00f', lineWidth:3 },
+                ],
                 progress = this._parent.allData['1'],
                 min = 10000,
                 mMin = Math.min,
-                i, record;
+                i, x;
 
             for(i = 0; i < progress.length; i++)
                 min = mMin(progress[i][1], min);
 
-            for(i = 0; i < progress.length; i++){
-                record = progress[i];
-                progressNow.push([ record[0], progress[i][1] || min ]);
-                progressWeekBefore.push([ record[0], (progress[ i - 7 ] || [])[1] || min ]);
-                progress12WeeksBefore.push([ record[0], (progress[ i - 84 ] || [])[1] || min ]);
-                progress26WeeksBefore.push([ record[0], (progress[ i - 182 ] || [])[1] || min ]);
-            }
+            for(i = 0; i < progress.length; i++)
+                for(x = 0; x < progressSeries.length; x++)
+                    progressSeries[x].data.push([ progress[i][0], progress[i - progressSeries[x].weeksBefore * 7 ][1] || min ]);
 
-            return Object.getPrototypeOf(this).graphData.call(this, [
-                {
-                    data: progress26WeeksBefore,
+            return Object.getPrototypeOf(this).graphData.call(this, progressSeries.map(function(item){
+                return {
+                    data: item.data,
                     curvedLines: { apply:true },
-                    lines: { show: true, lineWidth: 1},
-                    label: '6 months before',
+                    lines: { show:true, lineWidth:item.lineWidth || 1 },
+                    label: item.label,
                     yaxis: 2,
-                    color: '#fafafa'
-                },
-                {
-                    data: progress12WeeksBefore,
-                    curvedLines: { apply:true },
-                    label: '3 months before',
-                    lines: { show: true, lineWidth: 1},
-                    yaxis: 2,
-                    color: '#ccc'
-                },
-                {
-                    data: progressWeekBefore,
-                    curvedLines: { apply:true },
-                    lines: { show: true, lineWidth: 1},
-                    label: 'A week before',
-                    yaxis: 2,
-                    color: '#666'
-                },
-                {
-                    data: progressNow,
-                    curvedLines: { apply:true },
-                    lines: { show: true, lineWidth: 3},
-                    label: 'Current progress',
-                    yaxis: 2,
-                    // color the line green (for weight loss) or red (for weight gain)
-                    // * we assume the normal user wants to lose weight
-                    color: progressNow[progressNow.length - 1][1] > progressNow[0][1] ? '#900' : '#090'
-                }
-            ]);
+                    color: item.color
+                };
+            }));
         };
 
     }
