@@ -678,10 +678,9 @@
          * @param field
          * @param   {String}    [opt_label]     The optional label (hard-coded)
          * @param   {Object}    [opt_chartOptions]  The chart options
-         * @param   {String[]}  [opt_colors]    The optional colors to be applied to the series
          * @returns {SegmentGraph}
          */
-        this.init = function(parent, field, opt_label, opt_chartOptions, opt_colors){
+        this.init = function(parent, field, opt_label, opt_chartOptions){
             var markup = [
                 '<div class="graphContainer"> ',
                 '    <h2></h2> <h3>Average: <span></span></h3>',
@@ -721,7 +720,6 @@
                     {position: 'right', labelWidth: 30}
                 ],
                 series: {curvedLines: {active: true}},
-                colors: opt_colors,
                 selection: {
                     mode: "x"
                 },
@@ -1054,13 +1052,12 @@
         this.graphData = function(){
 
             var progressSeries = [
-                    { data:[], weeksBefore:12, label:'3 months before', color:'#fafafa' },
-                    { data:[], weeksBefore:8, label:'3 months before', color:'#eee' },
-                    { data:[], weeksBefore:4, label:'A month before', color:'#ccc' },
-                    { data:[], weeksBefore:3, label:'3 weeks before', color:'#999' },
-                    { data:[], weeksBefore:2, label:'2 weeks before', color:'#666' },
-                    { data:[], weeksBefore:1, label:'A week before', color:'#000' },
-                    { data:[], weeksBefore:0, label:'Current progress', color:'#00f', lineWidth:3 },
+                    { data:[], weeksBefore:12, label:'3 months before', color:'#fefefe' },
+                    { data:[], weeksBefore:4, label:'A month before', color:'#fafafa' },
+                    { data:[], weeksBefore:3, label:'3 weeks before', color:'#ddd' },
+                    { data:[], weeksBefore:2, label:'2 weeks before', color:'#bbb' },
+                    { data:[], weeksBefore:1, label:'A week before', color:'#333' },
+                    { data:[], weeksBefore:0, label:'Current progress', color:'#090', lineWidth:3 },
                 ],
                 progress = this._parent.allData['1'],
                 min = 10000,
@@ -1072,7 +1069,7 @@
 
             for(i = 0; i < progress.length; i++)
                 for(x = 0; x < progressSeries.length; x++)
-                    progressSeries[x].data.push([ progress[i][0], progress[i - progressSeries[x].weeksBefore * 7 ][1] || min ]);
+                    progressSeries[x].data.push([ progress[i][0], ( progress[i - progressSeries[x].weeksBefore * 7 ] || [] )[1] || min ]);
 
             return Object.getPrototypeOf(this).graphData.call(this, progressSeries.map(function(item){
                 return {
@@ -1085,6 +1082,35 @@
                 };
             }));
         };
+
+        /**
+         * show the tooltip when you hover over points on the graph
+         * @param event
+         * @param pos
+         * @param item
+         * @private
+         */
+        this._plotHover = function (event, pos, item) {
+            if (item) {
+                if (this.previousHoverPoint != item.dataIndex) {
+                    this.previousHoverPoint = item.dataIndex;
+                    $("#tooltip").remove();
+                    var text = item.datapoint[1];
+                    if (this.zooming)
+                        text = '* Pause / Reset zooming to click on a date! *';
+                    this._showTooltip(item.pageX, item.pageY, text);
+                }
+            } else {
+                $("#tooltip").remove();
+                this.previousHoverPoint = null;
+            }
+        };
+
+        /**
+         * Simply override with an empty function. We don't need a click here.
+         * @private
+         */
+        this._plotclick = function () {};
 
     }
     LookbackGraph.prototype = new SegmentGraph();
