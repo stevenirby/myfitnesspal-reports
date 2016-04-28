@@ -5,7 +5,7 @@ Myfitnesspal Report Bookmarklet
 * License: MIT
 * Meaning: Use everywhere and keep copyright header.
 
-Myfitnesspal Reports - Display pretty interactive charts for all your nutiritional, excersice, and weight progress.
+Myfitnesspal Reports - Display pretty interactive charts for all your nutritional, excersice, and weight progress.
 
 ## Getting Started
 
