@@ -260,7 +260,7 @@
          * @returns {*}
          */
         this.fetchData = function (segment, field) {
-            var url = 'http://www.myfitnesspal.com/reports/results/';
+            var url = 'https://www.myfitnesspal.com/reports/results/';
             url = url + segment + '/' + field + '/365.json'; // set this to 365 - weight loss data only comes in 7, 30, 90, and 365
 
             return $.ajax({
@@ -924,8 +924,8 @@
                     var x = item.datapoint[0].toFixed(2),
                         date = this.convertDateToString(x, true);
 
-                    console.log('http://www.myfitnesspal.com/food/diary?date=' +  date);
-                    window.open('http://www.myfitnesspal.com/food/diary?date=' +  date, '_blank');
+                    console.log('https://www.myfitnesspal.com/food/diary?date=' +  date);
+                    window.open('https://www.myfitnesspal.com/food/diary?date=' +  date, '_blank');
                 }
             }
         };
