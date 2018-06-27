@@ -1117,19 +1117,19 @@
     LookbackGraph.prototype.constructor = LookbackGraph;
 
 
-    addLink('http://www.sendsteven.com/wp-content/uploads/2013/02/style.css');
+    addLink('https://www.sendsteven.com/wp-content/uploads/2013/02/style.css');
     // figureout a better way to do the css, since github is setting a bad mine type
     // addLink('http://raw.github.com/stevenirby/myfitnesspal-reports/master/css/style.css');
-    addLink('http://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css');
+    addLink('https://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css');
 
     // add jQuery
-    addScript('http://code.jquery.com/jquery-1.9.0.min.js', function () {
-        addScript('http://code.jquery.com/ui/1.10.1/jquery-ui.js', function () {
+    addScript('https://code.jquery.com/jquery-1.9.0.min.js', function () {
+        addScript('https://code.jquery.com/ui/1.10.1/jquery-ui.js', function () {
             // add graphing library
             $(document).ready(function () {
-                addScript('http://cdn.rawgit.com/flot/flot/master/jquery.flot.js', function () {
-                    addScript('http://cdn.rawgit.com/flot/flot/master/jquery.flot.time.js', function () {
-                        addScript('http://cdn.rawgit.com/flot/flot/master/jquery.flot.selection.js', function () {
+                addScript('https://cdn.rawgit.com/flot/flot/master/jquery.flot.js', function () {
+                    addScript('https://cdn.rawgit.com/flot/flot/master/jquery.flot.time.js', function () {
+                        addScript('https://cdn.rawgit.com/flot/flot/master/jquery.flot.selection.js', function () {
                             window.Report = new Report().init();
                         });
                     });
