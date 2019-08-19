@@ -1,7 +1,7 @@
 Myfitnesspal Report Bookmarklet
 ====================
 
-* Author: Steven Irby [http://sendsteven.com/](http://sendsteven.com)
+* Author: Steven Irby [http://stevenirby.me/](http://stevenirby.me)
 * License: MIT
 * Meaning: Use everywhere and keep copyright header.
 
