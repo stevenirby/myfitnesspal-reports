@@ -9,7 +9,7 @@ Myfitnesspal Reports - Display pretty interactive charts for all your nutritiona
 
 ## Getting Started
 
-* Go [here] (http://stevenirby.github.io/myfitnesspal-reports/) and drag the bookmarklet up to your browser bookmark toolbar.
+* Go [here](http://stevenirby.github.io/myfitnesspal-reports/) and drag the bookmarklet up to your browser bookmark toolbar.
 * Login to myfitnesspal.com
 * Go to any page and press the bookmarklet button on your toolbar.
 
