@@ -22,7 +22,7 @@
  *
  * @file
  * @author Steven Irby
- * @email "Steven Irby" [info@sendsteven.com]
+ * @email "Steven Irby" [info@stevenirby.me]
  * @email "Moises Romero" [ezzygemini@gmail.com]
  * @since 2013
  * @version 2
@@ -1117,7 +1117,7 @@
     LookbackGraph.prototype.constructor = LookbackGraph;
 
 
-    addLink('https://www.sendsteven.com/wp-content/uploads/2013/02/style.css');
+    addLink('https://www.stevenirby.me/wp-content/uploads/2013/02/style.css');
     // figureout a better way to do the css, since github is setting a bad mine type
     // addLink('http://raw.github.com/stevenirby/myfitnesspal-reports/master/css/style.css');
     addLink('https://code.jquery.com/ui/1.10.1/themes/base/jquery-ui.css');
@@ -1127,9 +1127,9 @@
         addScript('https://code.jquery.com/ui/1.10.1/jquery-ui.js', function () {
             // add graphing library
             $(document).ready(function () {
-                addScript('https://cdn.rawgit.com/flot/flot/master/jquery.flot.js', function () {
-                    addScript('https://cdn.rawgit.com/flot/flot/master/jquery.flot.time.js', function () {
-                        addScript('https://cdn.rawgit.com/flot/flot/master/jquery.flot.selection.js', function () {
+                addScript('https://cdn.jsdelivr.net/gh/flot/flot@master/jquery.flot.js', function () {
+                    addScript('https://cdn.jsdelivr.net/gh/flot/flot@master/jquery.flot.time.js', function () {
+                        addScript('https://cdn.jsdelivr.net/gh/flot/flot@master/jquery.flot.selection.js', function () {
                             window.Report = new Report().init();
                         });
                     });
