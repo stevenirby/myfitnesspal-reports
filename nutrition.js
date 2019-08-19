@@ -1127,7 +1127,7 @@
         addScript('https://code.jquery.com/ui/1.10.1/jquery-ui.js', function () {
             // add graphing library
             $(document).ready(function () {
-                addScript('https://cdn.jsdelivr.net/gh/flot/flot/jquery.flot.min.js', function () {
+                addScript('https://cdn.jsdelivr.net/gh/flot/flot@v0.8.0/jquery.flot.min.js', function () {
                     addScript('https://cdn.jsdelivr.net/gh/flot/flot/jquery.flot.time.js', function () {
                         addScript('https://cdn.jsdelivr.net/gh/flot/flot@master/source/jquery.flot.selection.js', function () {
                             window.Report = new Report().init();
